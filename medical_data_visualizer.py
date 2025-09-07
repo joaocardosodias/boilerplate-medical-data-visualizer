@@ -3,11 +3,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 1
+
 # Vou importar os dados do arquivo csv e colocar na variável df
 df = pd.read_csv('medical_examination.csv')
 
-# 2
+
 # Aqui vou calcular o IMC e criar a coluna overweight
 # Primeiro calculo o IMC dividindo o peso pelo quadrado da altura em metros
 # Altura tá em cm, então divido por 100 pra converter pra metros
@@ -15,7 +15,7 @@ df = pd.read_csv('medical_examination.csv')
 # O método .astype(int) converte True para 1 e False para 0
 df['overweight'] = (df['weight'] / ((df['height'] / 100) ** 2) > 25).astype(int)
 
-# 3
+
 # Agora vou normalizar os dados de cholesterol e gluc
 # Se for 1, vou deixar como 0 (bom), se for maior que 1, vou deixar como 1 (ruim)
 # O método .astype(int) converte os valores booleanos (True/False) para inteiros (1/0)
@@ -23,11 +23,8 @@ df['overweight'] = (df['weight'] / ((df['height'] / 100) ** 2) > 25).astype(int)
 df['cholesterol'] = (df['cholesterol'] > 1).astype(int)
 df['gluc'] = (df['gluc'] > 1).astype(int)
 
-#4
-# Criar uma função para criar o gráfico de catplot,daria para fazer direto,mas por
-# questões de organização, vou criar uma função
+
 def draw_cat_plot():
-    # 5
     # Vou usar o pd.melt igual a professora disse no "plantão" pra reorganizar os dados e facilitar a visualização
     # Isso vai transformar as colunas em linhas, tipo uma tabela pivô ao contrário
     # id_vars=['cardio'] - mantém a coluna 'cardio' como identificador
@@ -37,7 +34,6 @@ def draw_cat_plot():
                      value_vars=['cholesterol', 'gluc', 'smoke', 'alco', 'active', 'overweight'])
 
     
-    # 6
     # Agora vou agrupar os dados por cardio e variable (que é o nome da coluna criada pelo melt)
     # E vou contar quantos valores tem em cada grupo
     # O método .size() conta quantas linhas existem em cada grupo
@@ -47,7 +43,6 @@ def draw_cat_plot():
     # O parâmetro inplace=True faz a alteração diretamente no DataFrame, sem precisar atribuir a uma nova variável
     df_cat.rename(columns={0: 'total'}, inplace=True)
     
-    # 7
     # Agora vou criar o gráfico usando o catplot do seaborn
     # Vou usar o kind='bar' pra criar um gráfico de barras
     # x='variable' - coloca as variáveis no eixo x
@@ -59,17 +54,12 @@ def draw_cat_plot():
     fig = sns.catplot(data=df_cat, kind='bar', x='variable', y='total', 
                       hue='value', col='cardio').fig
 
-
-    # 9
     # Salvar a figura no arquivo catplot.png
     fig.savefig('catplot.png')
     return fig
 
-
-# 10
-# Mesma coisa do grafico anterior,vou criar uma função para criar o heatmap
 def draw_heat_map():
-    # 11
+
     # Vou filtrar os dados pra remover os valores incorretos
     # Primeiro filtro onde a pressão diastólica é maior que a sistólica
     # Depois filtro altura e peso pelos percentis
@@ -84,7 +74,7 @@ def draw_heat_map():
         (df['weight'] <= df['weight'].quantile(0.975))
     ]
 
-    # 12
+
     # Calculo a matriz de correlação
     # O método .corr() calcula o coeficiente de correlação de Pearson entre todas as colunas numéricas
     # O resultado é uma matriz onde cada célula mostra a correlação entre duas variáveis
@@ -93,7 +83,7 @@ def draw_heat_map():
     # Valores próximos de 0 indicam pouca ou nenhuma correlação
     corr = df_heat.corr()
 
-    # 13
+
     # Crio uma máscara pro triângulo superior da matriz
     # Isso vai fazer com que só mostre metade do gráfico, sem repetir informação
     # A função np.triu() cria uma matriz triangular superior (upper triangle)
@@ -101,11 +91,11 @@ def draw_heat_map():
     # Isso é útil porque a matriz de correlação é simétrica (a correlação de A com B é igual à de B com A)
     mask = np.triu(corr)
 
-    # 14
+
     # Configuro a figura do matplotlib
     fig, ax = plt.subplots(figsize=(13, 10))
 
-    # 15
+
     # Desenho o mapa de calor usando o seaborn
     # Uso a máscara pra mostrar só o triângulo inferior
     # E adiciono as anotações com os valores da correlação
@@ -118,7 +108,7 @@ def draw_heat_map():
     # cbar_kws={'shrink': .5} - reduz o tamanho da barra de cores para metade
     sns.heatmap(corr, mask=mask, annot=True, fmt='.1f', square=True, center=0, linewidths=.5, cbar_kws={'shrink': .5})
 
-    # 16
+
     # Salvar a figura no arquivo heatmap.png
     fig.savefig('heatmap.png')
     return fig
